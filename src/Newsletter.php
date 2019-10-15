@@ -12,11 +12,14 @@ class Newsletter
     /** @var \Spatie\Newsletter\NewsletterListCollection */
     protected $lists;
 
-    public function __construct(MailChimp $mailChimp, NewsletterListCollection $lists)
+    private $enable;
+
+    public function __construct(MailChimp $mailChimp, NewsletterListCollection $lists, $enable)
     {
         $this->mailChimp = $mailChimp;
 
         $this->lists = $lists;
+        $this->enable = $enable;
     }
 
     public function subscribe(string $email, array $mergeFields = [], string $listName = '', array $options = [])
@@ -53,6 +56,47 @@ class Newsletter
             return false;
         }
 
+        return $response;
+    }
+
+    /**
+     * Add emails to segment
+     *
+     * @param array $emails
+     * @param $segmentId
+     * @param string $listName
+     * @return bool
+     */
+    public function addToSegment(array $emails, $segmentId,  $listName = '')
+    {
+        $list = $this->lists->findByName($listName);
+        if(!$this->enable) {
+            return true;
+        }
+        $response = $this->mailChimp->post("lists/{$list->getId()}/segments/{$segmentId}",['members_to_add' => $emails]);
+        if (! $this->lastActionSucceeded()) {
+            return false;
+        }
+        return $response;
+    }
+    /**
+     * Remove emails from segment
+     *
+     * @param array $emails
+     * @param $segmentId
+     * @param string $listName
+     * @return bool
+     */
+    public function removeFromSegment(array $emails, $segmentId,  $listName = '')
+    {
+        $list = $this->lists->findByName($listName);
+        if(!$this->enable) {
+            return true;
+        }
+        $response = $this->mailChimp->post("lists/{$list->getId()}/segments/{$segmentId}",['members_to_remove' => $emails]);
+        if (! $this->lastActionSucceeded()) {
+            return false;
+        }
         return $response;
     }
 
