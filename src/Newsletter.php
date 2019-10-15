@@ -28,6 +28,10 @@ class Newsletter
 
         $options = $this->getSubscriptionOptions($email, $mergeFields, $options);
 
+        if(!$this->enable){
+            return true;
+        }
+
         $response = $this->mailChimp->post("lists/{$list->getId()}/members", $options);
 
         if (! $this->lastActionSucceeded()) {
@@ -49,6 +53,10 @@ class Newsletter
         $list = $this->lists->findByName($listName);
 
         $options = $this->getSubscriptionOptions($email, $mergeFields, $options);
+
+        if(!$this->enable){
+            return true;
+        }
 
         $response = $this->mailChimp->put("lists/{$list->getId()}/members/{$this->getSubscriberHash($email)}", $options);
 
@@ -104,6 +112,10 @@ class Newsletter
     {
         $list = $this->lists->findByName($listName);
 
+        if(!$this->enable){
+            return true;
+        }
+
         return $this->mailChimp->get("lists/{$list->getId()}/members", $parameters);
     }
 
@@ -111,12 +123,20 @@ class Newsletter
     {
         $list = $this->lists->findByName($listName);
 
+        if(!$this->enable){
+            return true;
+        }
+
         return $this->mailChimp->get("lists/{$list->getId()}/members/{$this->getSubscriberHash($email)}");
     }
 
     public function getMemberActivity(string $email, string $listName = '')
     {
         $list = $this->lists->findByName($listName);
+
+        if(!$this->enable){
+            return true;
+        }
 
         return $this->mailChimp->get("lists/{$list->getId()}/members/{$this->getSubscriberHash($email)}/activity");
     }
@@ -155,6 +175,10 @@ class Newsletter
     {
         $list = $this->lists->findByName($listName);
 
+        if(!$this->enable){
+            return true;
+        }
+
         $response = $this->mailChimp->patch("lists/{$list->getId()}/members/{$this->getSubscriberHash($email)}", [
             'status' => 'unsubscribed',
         ]);
@@ -170,6 +194,10 @@ class Newsletter
     {
         $list = $this->lists->findByName($listName);
 
+        if(!$this->enable){
+            return true;
+        }
+
         $response = $this->mailChimp->patch("lists/{$list->getId()}/members/{$this->getSubscriberHash($currentEmailAddress)}", [
             'email_address' => $newEmailAddress,
         ]);
@@ -180,6 +208,10 @@ class Newsletter
     public function delete(string $email, string $listName = '')
     {
         $list = $this->lists->findByName($listName);
+
+        if(!$this->enable){
+            return true;
+        }
 
         $response = $this->mailChimp->delete("lists/{$list->getId()}/members/{$this->getSubscriberHash($email)}");
 
@@ -253,6 +285,10 @@ class Newsletter
 
         $options = array_merge($defaultOptions, $options);
 
+        if(!$this->enable){
+            return true;
+        }
+
         $response = $this->mailChimp->post('campaigns', $options);
 
         if (! $this->lastActionSucceeded()) {
@@ -275,6 +311,10 @@ class Newsletter
         $defaultOptions = compact('html');
 
         $options = array_merge($defaultOptions, $options);
+
+        if(!$this->enable){
+            return true;
+        }
 
         $response = $this->mailChimp->put("campaigns/{$campaignId}/content", $options);
 
